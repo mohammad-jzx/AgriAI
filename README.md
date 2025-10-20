@@ -25,30 +25,10 @@
 
 ## التثبيت والإعداد
 
-### 1. تثبيت متطلبات Python
-```bash
-pip install -r requirements.txt
-```
-
 ### 2. تثبيت متطلبات Node.js
 ```bash
 npm install
 ```
-
-### 3. إعداد النموذج
-يجب وضع نموذج YOLOv5 المدرب في المسار المحدد في ملف `plant_disease_api.py`:
-```
-MODEL_PATH = "D:/DatabasesANDModels/plant_disease_coco/yolo_output/plant_disease_model/weights/best.pt"
-YAML_PATH = "D:/DatabasesANDModels/plant_disease_coco/data.yaml"
-```
-
-## تشغيل التطبيق
-
-### 1. تشغيل خادم API
-```bash
-python plant_disease_api.py
-```
-سيتم تشغيل الخادم على المنفذ 5000.
 
 ### 2. تشغيل واجهة المستخدم
 ```bash
@@ -57,6 +37,18 @@ npm run dev
 سيتم تشغيل واجهة المستخدم على المنفذ 5173.
 
 ## استخدام النظام
+لتشفيل تحليل اوراق النبات (الامراض)
+cd 1cnn
+
+python -m venv .venv
+
+after create active the .venv
+
+pip install -r requirements.txt
+وإذا ما عندك، يمكنك تثبيت المكتبات الأساسية يدويًا:
+pip install tensorflow keras torch torchvision scikit-learn opencv-python numpy pandas flask matplotlib
+
+python app.py
 
 1. افتح المتصفح وانتقل إلى `http://localhost:5173`
 2. اختر نوع النبات من القائمة المنسدلة
@@ -64,17 +56,7 @@ npm run dev
 4. انتظر حتى يتم تحليل الصورة
 5. اطلع على النتائج والتوصيات العلاجية
 
-## تحسين النموذج
-
-لتحسين دقة النموذج، يمكنك:
-
-1. جمع المزيد من الصور لأمراض النباتات
-2. تحسين ملصقات البيانات (annotations) في مجموعة البيانات
-3. إعادة تدريب النموذج باستخدام ملف `train_yolov5.py`
-
-## معلومات عن النموذج
-
-- **نوع النموذج**: YOLOv5 (You Only Look Once)
+-نموذج تحليل امراض النبات عن طريق الورق)
 - **مجموعة البيانات**: صور مصنفة بتنسيق COCO
 - **الأمراض المدعومة**:
   - مرض نبات الصوبا
