@@ -23,7 +23,6 @@ import Tutorial from './components/Tutorial';
 import ChatBubble from './components/ChatBubble';
 const StoreShim = React.lazy(() => import('./modules/StoreShim'));
 const CropdateShim = React.lazy(() => import('./modules/CropdateShim'));
-const DiseaseAnalysisPage = React.lazy(() => import('./modules/disease-analysis').then(m => ({ default: m.DiseaseAnalysisPage })));
 import { isFirstVisit, markTutorialCompleted } from './utils/tutorialStorage';
 
 // دالة مساعدة آمنة للتعامل مع toFixed
@@ -35,7 +34,7 @@ function safeToFixed(value: number | null | undefined, digits: number = 1): stri
 }
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'home' | 'monitoring' | 'crops' | 'analysis' | 'history' | 'audio' | 'planner' | 'plant-disease' | 'disease-analysis' | 'store'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'monitoring' | 'crops' | 'analysis' | 'history' | 'audio' | 'planner' | 'plant-disease' | 'store'>('home');
   const [selectedCrop, setSelectedCrop] = useState<Crop | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [showManualInput, setShowManualInput] = useState(false);
@@ -433,8 +432,7 @@ function App() {
                         { id: 'audio', label: 'التحليل الصوتي', icon: <Mic className="w-5 h-5" />, dataTour: 'voice-assistant' },
                         { id: 'history', label: 'السجلات والتقارير', icon: <History className="w-5 h-5" />, dataTour: 'history' },
                         { id: 'planner', label: 'نضج المحصول والحصاد الذكي', icon: <Leaf className="w-5 h-5 rotate-45" />, dataTour: 'planner' },
-                        { id: 'plant-disease', label: 'تحليل أمراض النباتات (قديم)', icon: <BarChart3 className="w-5 h-5" /> },
-                        { id: 'disease-analysis', label: 'تحليل الأمراض الذكي', icon: <TestTube className="w-5 h-5" /> },
+                        { id: 'plant-disease', label: 'تحليل أمراض النباتات', icon: <BarChart3 className="w-5 h-5" /> },
                       ].map((item, index) => (
                         <button
                           key={item.id}
@@ -844,14 +842,6 @@ function App() {
                     <div className="w-full">
                       <React.Suspense fallback={<div className="p-4 text-center">جارٍ تحميل واجهة تخطيط المحاصيل…</div>}>
                         <CropdateShim />
-                      </React.Suspense>
-                    </div>
-                  )}
-
-                  {activeTab === 'disease-analysis' && (
-                    <div className="w-full -m-6">
-                      <React.Suspense fallback={<div className="p-4 text-center">جارٍ تحميل محلل الأمراض الذكي…</div>}>
-                        <DiseaseAnalysisPage />
                       </React.Suspense>
                     </div>
                   )}
