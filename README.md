@@ -38,6 +38,7 @@ npm run dev
 
 ## استخدام النظام
 لتشفيل تحليل اوراق النبات (الامراض)
+
 cd 1cnn
 
 python -m venv .venv
