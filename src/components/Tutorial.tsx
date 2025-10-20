@@ -129,7 +129,24 @@ const Tutorial: React.FC<TutorialProps> = ({ isFirstVisit, onComplete }) => {
       ),
       disableBeacon: true,
     },
-    
+    {
+      target: '[data-tour="image-analysis"]',
+      content: (
+        <div className="text-right p-2">
+          <div className="flex justify-center mb-3">
+            <div className="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center">
+              <span className="text-2xl">📷</span>
+            </div>
+          </div>
+          <h3 className="font-bold text-lg text-green-600 mb-2">تحليل الصور</h3>
+          <p className="text-gray-700 dark:text-gray-300">قم بتحليل صور المحاصيل للكشف عن الأمراض والآفات باستخدام الذكاء الاصطناعي.</p>
+          <div className="mt-3 bg-rose-50 dark:bg-rose-900 p-2 rounded-lg border-r-4 border-rose-400">
+            <p className="text-sm text-rose-700 dark:text-rose-300">💡 تلميح: التقط صوراً واضحة وقريبة للأوراق المصابة للحصول على أفضل تحليل.</p>
+          </div>
+        </div>
+      ),
+      disableBeacon: true,
+    },
     {
       target: '[data-tour="voice-assistant"]',
       content: (
