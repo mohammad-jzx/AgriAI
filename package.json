@@ -20,10 +20,12 @@
     "dotenv": "^17.1.0",
     "express": "^5.1.0",
     "lucide-react": "^0.263.1",
+    "openai": "^6.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-joyride": "^2.9.3",
     "react-mermaid2": "^0.1.4",
+    "react-router-dom": "^6.30.1",
     "react-webcam": "^7.2.0",
     "recharts": "^2.8.0",
     "twilio": "^5.7.1"

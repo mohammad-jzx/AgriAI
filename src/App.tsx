@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Activity, Wifi, WifiOff, Droplets, Thermometer, Gauge, Beaker, Leaf, TrendingUp, BarChart3, History, Settings, Mic, Wrench, Moon, Sun, MapPin, CalendarCheck, Hammer, Zap, TestTube, Cloud } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Activity, WifiOff, Droplets, Thermometer, Leaf, TrendingUp, BarChart3, History, Settings, Mic, Moon, Sun, MapPin, Zap, TestTube, Cloud } from 'lucide-react';
 import SensorCard from './components/SensorCard';
 import SensorStatus from './components/SensorStatus';
 import CropSelector from './components/CropSelector';
@@ -18,10 +18,11 @@ import ResultsSection from './components/ResultsSection';
 import { recommendCrops } from './utils/cropRecommendationEngine';
 import type { EnvironmentalInputs, CropRecommendation } from './types/crop';
 import StatCard from './components/StatCard';
-import MaturityAnalysis from './components/MaturityAnalysis';
-import ImageAnalysisPage from './components/ImageAnalysisPage';
 import VoiceToText from './components/VoiceToText';
 import Tutorial from './components/Tutorial';
+import ChatBubble from './components/ChatBubble';
+const StoreShim = React.lazy(() => import('./modules/StoreShim'));
+const CropdateShim = React.lazy(() => import('./modules/CropdateShim'));
 import { isFirstVisit, markTutorialCompleted } from './utils/tutorialStorage';
 
 // دالة مساعدة آمنة للتعامل مع toFixed
@@ -33,7 +34,7 @@ function safeToFixed(value: number | null | undefined, digits: number = 1): stri
 }
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'home' | 'monitoring' | 'crops' | 'image' | 'analysis' | 'history' | 'audio' | 'planner' | 'maturity'>('home');
+  const [activeTab, setActiveTab] = useState<'home' | 'monitoring' | 'crops' | 'analysis' | 'history' | 'audio' | 'planner' | 'plant-disease' | 'store'>('home');
   const [selectedCrop, setSelectedCrop] = useState<Crop | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [showManualInput, setShowManualInput] = useState(false);
@@ -427,11 +428,11 @@ function App() {
                         { id: 'monitoring', label: 'المراقبة المباشرة', icon: <Activity className="w-5 h-5" />, dataTour: 'dashboard' },
                         { id: 'crops', label: 'اختيار المحصول', icon: <Leaf className="w-5 h-5" />, dataTour: 'crops' },
                         { id: 'analysis', label: 'التحليل والتوصيات', icon: <TrendingUp className="w-5 h-5" />, dataTour: 'analysis' },
-                        { id: 'maturity', label: 'نضج المحصول والحصاد الذكي', icon: <CalendarCheck className="w-5 h-5" /> },
-                        { id: 'image', label: 'تحليل الصور', icon: <BarChart3 className="w-5 h-5" />, dataTour: 'image-analysis' },
+                        { id: 'store', label: 'المتجر', icon: <History className="w-5 h-5" /> },
                         { id: 'audio', label: 'التحليل الصوتي', icon: <Mic className="w-5 h-5" />, dataTour: 'voice-assistant' },
                         { id: 'history', label: 'السجلات والتقارير', icon: <History className="w-5 h-5" />, dataTour: 'history' },
-                        { id: 'planner', label: 'تخطيط المحاصيل', icon: <Leaf className="w-5 h-5 rotate-45" />, dataTour: 'planner' },
+                        { id: 'planner', label: 'نضج المحصول والحصاد الذكي', icon: <Leaf className="w-5 h-5 rotate-45" />, dataTour: 'planner' },
+                        { id: 'plant-disease', label: 'تحليل أمراض النباتات', icon: <BarChart3 className="w-5 h-5" /> },
                       ].map((item, index) => (
                         <button
                           key={item.id}
@@ -775,8 +776,22 @@ function App() {
                     </div>
                   )}
 
-                  {activeTab === 'image' && (
-                    <ImageAnalysisPage />
+                  {activeTab === 'plant-disease' && (
+                    <div className="w-full h-[80vh]">
+                      <iframe
+                        src="/cnn/index.html"
+                        title="تحليل أمراض النباتات"
+                        className="w-full h-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white"
+                      />
+                    </div>
+                  )}
+
+                  {activeTab === 'store' && (
+                    <div className="w-full">
+                      <React.Suspense fallback={<div className="p-4">جارٍ تحميل المتجر…</div>}>
+                        <StoreShim />
+                      </React.Suspense>
+                    </div>
                   )}
 
                   {activeTab === 'analysis' && (
@@ -824,42 +839,20 @@ function App() {
                   {activeTab === 'audio' && <VoiceToText />}
 
                   {activeTab === 'planner' && (
-                    <div>
-                      <h2 className="text-2xl font-bold text-green-700 dark:text-green-500 mb-4 text-center justify-center">تخطيط المحاصيل</h2>
-                      <div className="p-6 text-gray-800 dark:text-gray-200 bg-transparent">
-                        <InputForm
-                          inputs={plannerInputs}
-                          onInputChange={(inputs) => {
-                            setPlannerInputs(inputs);
-                            setPlannerSearched(false);
-                          }}
-                          onAnalyze={() => {
-                            const all = recommendCrops(plannerCrops, plannerInputs);
-                            const filtered = all
-                              .filter(crop => crop.nameAr !== plannerInputs.previousCrop)
-                              .filter((crop, idx, arr) => arr.findIndex(c => c.nameAr === crop.nameAr) === idx)
-                              .filter(crop => crop.suitabilityScore > 60)
-                              .sort((a, b) => b.suitabilityScore - a.suitabilityScore);
-                            setRecommendations(filtered);
-                            setPlannerSearched(true);
-                          }}
-                          disableAnalyze={!(plannerInputs.soilType && plannerInputs.currentSeason)}
-                        />
-                        {plannerSearched && <ResultsSection recommendations={recommendations} />}
-                      </div>
+                    <div className="w-full">
+                      <React.Suspense fallback={<div className="p-4 text-center">جارٍ تحميل واجهة تخطيط المحاصيل…</div>}>
+                        <CropdateShim />
+                      </React.Suspense>
                     </div>
                   )}
 
-                  {activeTab === 'maturity' && (
-                    <div>
-                      <MaturityAnalysis />
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
           </div>
         </main>
+
+        
       </div>
 
       {/* Manual Input Modal */}
@@ -874,6 +867,9 @@ function App() {
       {showTutorial && (
         <Tutorial isFirstVisit={showTutorial} onComplete={handleTutorialComplete} />
       )}
+
+      {/* Global chat bubble */}
+      <ChatBubble />
     </>
   );
 }
